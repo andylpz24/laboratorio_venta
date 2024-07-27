@@ -1,8 +1,6 @@
 '''Desafío 2: Sistema de Gestión de Ventas
 Objetivo: Desarrollar un sistema para registrar y gestionar ventas de productos.
-
 Requisitos:
-
 Crear una clase base Venta con atributos como fecha, cliente, productos vendidos, etc.
 Definir al menos 2 clases derivadas para diferentes tipos de ventas (por ejemplo, VentaOnline, VentaLocal) con atributos y métodos específicos.
 Implementar operaciones CRUD para gestionar las ventas.
@@ -12,15 +10,16 @@ Persistir los datos en archivo JSON.'''
 import json
 
 class Venta():
-    def __init__(self,fecha,cliente,productos_vendidos):
+    def __init__(self,fecha, cliente, productos_vendidos, codigo_venta):
         self.__fecha = fecha
-        self.__cliente = self.nuevo_cliente(cliente)
+        self.__cliente = self.nuevo_cliente(cliente) #------ usa la funcion para crear el objeto
         self.__productos_vendidos = self.nuevo_producto(productos_vendidos)
+        self.__codigo_venta = self.nuevo_codigo(codigo_venta)
 
-    @property
-    def cliente(self):
+    @property                          #---------------- property conviente los atributos en propiedad, esto se hace para
+    def cliente(self):                 # no usar objeto.atributo() sino que funciona sin () y se puede aplicar logica y consultar/modificar el dato
         return self.__cliente
-    
+
     @property
     def fecha(self):
         return self.__fecha
@@ -28,148 +27,165 @@ class Venta():
     @property
     def productos_vendidos(self):
         return self.__productos_vendidos
-    
-    def to_dict(self):
+
+    @property
+    def codigo_venta(self):
+        return self.__codigo_venta
+
+    def to_dict(self):                  #--------------- diccionario para llamar a los atributos de la clase base
         return {
             'fecha' : self.fecha,
             'cliente' : self.cliente,
-            'productos vendidos' : self.productos_vendidos
+            'productos vendidos' : self.productos_vendidos,
+            'codigo de venta' : self.codigo_venta
             }
-    @cliente.setter
+
+    @cliente.setter                    #---------------- setter es para modificar el atributo
     def cliente(self,validar_cliente):
-        self.__cliente = self.nuevo_cliente(validar_cliente)
+        self.__cliente = self.nuevo_cliente(validar_cliente) #------------ usa la funcion para actualizar/modificar el objeto
 
     @productos_vendidos.setter
     def producto(self, validar_producto):
         self.productos_vendidos = self.nuevo_producto(validar_producto)
 
-    def nuevo_cliente(self, cliente):
+    @codigo_venta.setter
+    def codigo(self,validar_codigo):
+        self.codigo_venta = self.nuevo_codigo(validar_codigo)
+
+    def nuevo_cliente(self, cliente):   #------------- es funcion para validar el tipo de dato, la misma que recibe el atributo original su el setter       
         try:
-            N_cliente = cliente
+            N_cliente = cliente                      # tener cuidado con esta linea y la siguiente que puede tener errores comunes
             if N_cliente != str(cliente):
                 raise ValueError('el nombre no lleva numeros desde el if')
             return N_cliente
         except ValueError:
             raise ValueError('el nombre no lleva numeros desde el except')
-        
-    def nuevo_producto(self, producto): #hay que probar
+
+    def nuevo_producto(self, producto): 
         try:
             N_producto = producto
             if N_producto != int(producto):
-                raise ValueError('el producto no lleva letras desde el if')
+                raise ValueError('el producto no lleva letras (desde if)')
             return N_producto
         except ValueError:
-            raise ValueError('el producto no lleva letras desde el except')
-    
-    def __str__(self) -> str:
-        return f'{self.fecha}, {self.cliente},{self.productos_vendidos}'
-    
+            raise ValueError('el producto no lleva letras (desde except)')
+
+    def nuevo_codigo(self, codigo):
+        try:
+            N_codigo = codigo
+            if N_codigo != int(codigo):
+                raise ValueError('el producto no lleva letras (desde if)')
+            return N_codigo
+        except ValueError:
+            raise ValueError('el producto no lleva letras (desde except)')
+
+    def __str__(self):                  #-------------- metodo str para llamar a los atributos en string
+        return f'{self.fecha}, {self.cliente},{self.productos_vendidos}, {self.codigo_venta}'
+
 class VentaOnline(Venta):
-    def __init__(self, fecha, cliente, productos_vendidos,pagina):
-        super().__init__(fecha, cliente, productos_vendidos)
+    def __init__(self, fecha, cliente, productos_vendidos, codigo_venta, pagina):
+        super().__init__(fecha, cliente, productos_vendidos, codigo_venta)
         self.__pagina = pagina
 
     @property
     def pagina(self):
         return self.__pagina
 
+    def to_dict(self):                #----------- estudiar este metodo
+        data = super().to_dict()
+        data['pagina'] = self.pagina
+        return data
+
+    def __str__(self):
+        return f'{super().__str__()} pagina: {self.pagina}'        #----------- estudiar esta linea
+
 class VentaLocal(Venta):
-    def __init__(self, fecha, cliente, productos_vendidos,local):
-        super().__init__(fecha, cliente, productos_vendidos)
+    def __init__(self, fecha, cliente, productos_vendidos,codigo_venta,local):
+        super().__init__(fecha, cliente, productos_vendidos,codigo_venta)
         self.__local = local
 
     @property
     def local(self):
         return self.__local
 
-venta = Venta('12/03/2003', 'rodrigo mora', 3)
-print(venta) 
-venta = venta.nuevo_cliente('hoiad'), venta.nuevo_producto(5)
-print(venta)
-# venta = venta.nuevo_cliente('asdasd') #aca hay un problema
-# print(venta)
-
-'''Desafío 1: Sistema de Gestión de Productos
-Objetivo: Desarrollar un sistema para manejar productos en un inventario.
-
-Requisitos:
-
-Crear una clase base Producto con atributos como nombre, precio, cantidad en stock, etc.
-Definir al menos 2 clases derivadas para diferentes categorías de productos (por ejemplo, ProductoElectronico, ProductoAlimenticio) con atributos y métodos específicos.
-Implementar operaciones CRUD para gestionar productos del inventario.
-Manejar errores con bloques try-except para validar entradas y gestionar excepciones.
-Persistir los datos en archivo JSON.'''
-
-# class Producto:
-#     def __init__(self, nombre, precio, cantidad_stock):
-#         self.__nombre = self.validar_nombre(nombre)
-#         self.__precio = self.validar_precio(precio)
-#         self.__cantidad_stock = self.validar_cantidad_stock(cantidad_stock)
+    def to_dict(self):
+        data = super().to_dict()
+        data['local'] = self.local
+        return data
     
-#     @property
-#     def nombre(self):
-#         return self.__nombre
-#     @property
-#     def precio(self):
-#         return self.__precio
-#     @property
-#     def cantidad(self):
-#         return self.__cantidad_stock
+    def __str__(self):
+        return f'{super().__str__()} local: {self.local}'
 
-#     @nombre.setter
-#     def nombre(self, nuevo_nombre):
-#         self.__nombre = self.validar_nombre(nuevo_nombre)
-
-#     @precio.setter
-#     def precio(self, validar_precio):
-#         self.__precio = self.validar_precio(validar_precio)
-        
-#     @cantidad.setter
-#     def cantidad (self, validar_cantidad_stock):
-#         self.__cantidad_stock = self.validar_cantidad_stock(validar_cantidad_stock)
-
-#     def __str__(self) -> str:
-#         return f'{self.cantidad}, {self.nombre},{self.precio}'
+class Gestion():
+    def __init__(self, archivo_json):
+        self.archivo = archivo_json
     
-#     def validar_precio(self, precio):
-#         try:
-#             precio_producto = precio
+    def leer_archivo_json(self):          #---------- probar y estudiar
+        try:
+            with open(self.archivo, 'r') as file:    #-------- abre un archivo, 'r' (lee el archivo) y lo guarda en una variable
+                datos = json.load(file)              #-------- json.load() se usa para que python lo pueda manejar al archivo json
+        except FileNotFoundError:
+            return {}
+        except Exception as error:                   #-------- error es una variable que guarda exception
+            raise Exception(f'error al abrir el archivo: {error}')
+        else:
+            return datos
 
-#             if precio_producto == str(precio):
-#                 raise ValueError('el valor debe ser numerico')
+    def guardar_datos(self,datos):               #------------ probar y estudiar
+        try:
+            with open(self.archivo) as file:
+                json.dump(datos,file, indent=4)          #-------- dump es lo opuesto a load, convierte un objeto python a uno json para modificarlo     
+        except IOError as error:                 #---------------------- estudiar esta linea (probar otro nomre en IOError)
+            print(f'error al guardar los datos en {self.archivo}: {error}  (except 1)')
+        except Exception as error:
+            print(f'error inesperado {error}   (except 2)')
 
-#             if precio_producto < 0:
-#                 raise ValueError("Monto no disponible, menor a  0 no es valido")
-#             return precio_producto
-#         except ValueError:
-#             raise ValueError("Monto menor a 0 no es valido")
-    
-#     def validar_cantidad_stock(self, cantidad):
-#         try:
-#             cantidad_producto = int(cantidad)
-#             if len(str(cantidad)) not in [1, 999]:
-#                 raise ValueError("Monto no disponible")
-#             if cantidad_producto <= 0:
-#                 raise ValueError("Monto menor a 0 no disponible")
-#             return cantidad_producto
-#         except ValueError:
-#             raise ValueError("El precio de ser oscilar de 1 a 999 únicamente")
-    
-#     def validar_nombre(self,nombre):
-#         return nombre
-        
-# producto = Producto('ferrari',80,8)
-# print(producto)
-# producto = producto.validar_precio(1300)
-# print(producto)
+    def crear_venta(self, codigo_v):             #------------ posible error desde el main 'agregar_venta()'
+        try:
+            datos = self.leer_archivo_json()
+            codigo = codigo_v.codigo_venta
+            if not str(codigo) in datos.keys():
+                datos[codigo] = codigo_v.to_dict()
+                self.guardar_datos(datos)              #--------- revisar la linea de abajo, porsible error en producto
+                print(f'la venta se realizo correctamente \n cliente:{codigo.cliente} \n producto: {codigo.productos_vendidos}  (desde if)')
+            else:
+                print(f'codigo {codigo} (desde else)')
+        except Exception as error:
+            print(f'Error inesperado al crear venta: {error}  (desde except)')
+
+    def encontrar_venta(self, codigo_v):
+        try:
+            datos = self.leer_archivo_json()
+            if codigo_v in datos:                    # ----------- posible error en nombre de variable codigo_v
+                venta_data = datos[codigo_v]
+                if 'pagina' in venta_data:
+                    venta = VentaOnline(**venta_data)     #------ ** significa que es o pasa un diccionario 
+                else:
+                    venta = VentaLocal(**venta_data)
+                print(f' venta encontrada con codigo {codigo_v}')
+            else:
+                print(f'mo se encontro codigo de venta Nº {codigo_v}')
+
+        except Exception as error:
+            print(f'error al encontrar la venta: {error}')
+
+    def eliminar_venta(self, codigo_v):
+        try:
+            datos = self.leer_archivo_json()
+            if str(codigo_v) in datos.keys:
+                del datos[codigo_v]
+                self.guardar_datos(datos)
+                print('venta eliminada')
+            else:
+                print(f'no se encontro una venta con codigo {codigo_v}')
+
+        except Exception as error:
+            print(f'error al eliminar venta: {error}')
+
+p = Venta('12/03/1350','andy',12,3215)
+print(p)
+p = p.nuevo_codigo(21),p.nuevo_cliente('dfglokjnhsfd'),p.nuevo_producto(36)
+print(p)
 
 
-# Mostrar información: Imprimir los detalles del producto.
-# Actualizar stock: Modificar la cantidad disponible.
-# La clase Tienda debe tener un atributo productos (una lista) para almacenar objetos Producto. Además, debe tener métodos para:
 
-# Agregar producto: Crear un validar objeto Producto y agregarlo a la lista.
-# Mostrar productos: Imprimir una lista de todos los productos disponibles.
-# Buscar producto: Buscar un producto por nombre y devolverlo.
-# Actualizar producto: Modificar los atributos de un producto existente.
-# Eliminar producto: Eliminar un producto de la lista. 
