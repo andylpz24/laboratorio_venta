@@ -12,12 +12,12 @@ import json
 class Venta():
     def __init__(self,fecha, cliente, productos_vendidos, codigo_venta):
         self.__fecha = fecha
-        self.__cliente = self.nuevo_cliente(cliente) #------ usa la funcion para crear el objeto
+        self.__cliente = self.nuevo_cliente(cliente)     #------ usa la funcion para crear el objeto
         self.__productos_vendidos = self.nuevo_producto(productos_vendidos)
         self.__codigo_venta = self.nuevo_codigo(codigo_venta)
 
-    @property                          #---------------- property conviente los atributos en propiedad, esto se hace para
-    def cliente(self):                 # no usar objeto.atributo() sino que funciona sin () y se puede aplicar logica y consultar/modificar el dato
+    @property                       #---- property conviente los atributos en propiedad, esto se hace para  no usar objeto.atributo() 
+    def cliente(self):              #---- sino que funciona sin () y se puede aplicar logica y consultar/modificar el dato
         return self.__cliente
 
     @property
@@ -45,39 +45,39 @@ class Venta():
         self.__cliente = self.nuevo_cliente(validar_cliente) #------------ usa la funcion para actualizar/modificar el objeto
 
     @productos_vendidos.setter
-    def producto(self, validar_producto):
-        self.productos_vendidos = self.nuevo_producto(validar_producto)
+    def productos_vendidos(self, validar_producto):
+        self.__productos_vendidos = self.nuevo_producto(validar_producto)
 
     @codigo_venta.setter
-    def codigo(self,validar_codigo):
-        self.codigo_venta = self.nuevo_codigo(validar_codigo)
+    def codigo_venta(self,validar_codigo):
+        self.__codigo_venta = self.nuevo_codigo(validar_codigo)
 
     def nuevo_cliente(self, cliente):   #------------- es funcion para validar el tipo de dato, la misma que recibe el atributo original su el setter       
         try:
             N_cliente = cliente                      # tener cuidado con esta linea y la siguiente que puede tener errores comunes
             if N_cliente != str(cliente):
-                raise ValueError('el nombre no lleva numeros desde el if')
+                raise ValueError('el nombre del cliente no lleva numeros desde el if')
             return N_cliente
         except ValueError:
-            raise ValueError('el nombre no lleva numeros desde el except')
+            raise ValueError('el nombre del cliente lleva numeros desde el except')
 
     def nuevo_producto(self, producto): 
         try:
             N_producto = producto
-            if N_producto != int(producto):
-                raise ValueError('el producto no lleva letras (desde if)')
+            if N_producto != str(producto):
+                raise ValueError('el nombre del producto no lleva numeros (desde if)')
             return N_producto
         except ValueError:
-            raise ValueError('el producto no lleva letras (desde except)')
+            raise ValueError('el nombre del producto no lleva numeros (desde except)')
 
     def nuevo_codigo(self, codigo):
         try:
             N_codigo = codigo
             if N_codigo != int(codigo):
-                raise ValueError('el producto no lleva letras (desde if)')
+                raise ValueError('el codigo de venta no lleva letras (desde if)')
             return N_codigo
         except ValueError:
-            raise ValueError('el producto no lleva letras (desde except)')
+            raise ValueError('el codigo de venta no lleva letras (desde except)')
 
     def __str__(self):                  #-------------- metodo str para llamar a los atributos en string
         return f'{self.fecha}, {self.cliente},{self.productos_vendidos}, {self.codigo_venta}'
@@ -85,7 +85,7 @@ class Venta():
 class VentaOnline(Venta):
     def __init__(self, fecha, cliente, productos_vendidos, codigo_venta, pagina):
         super().__init__(fecha, cliente, productos_vendidos, codigo_venta)
-        self.__pagina = pagina
+        self.__pagina = self.nueva_pagina(pagina)
 
     @property
     def pagina(self):
@@ -95,6 +95,19 @@ class VentaOnline(Venta):
         data = super().to_dict()
         data['pagina'] = self.pagina
         return data
+    
+    @pagina.setter
+    def pagina(self, validar_pagina):
+        self.__pagina = self.nueva_pagina(validar_pagina)
+
+    def nueva_pagina(self, pagina):
+        try:
+            N_pagina = pagina
+            if N_pagina != str(pagina):
+                raise ValueError('valor no valido (desde if)')
+            return  N_pagina
+        except Exception as error:
+            print(f'error inesperado: {error} (desde except)')
 
     def __str__(self):
         return f'{super().__str__()} pagina: {self.pagina}'        #----------- estudiar esta linea
@@ -102,7 +115,7 @@ class VentaOnline(Venta):
 class VentaLocal(Venta):
     def __init__(self, fecha, cliente, productos_vendidos,codigo_venta,local):
         super().__init__(fecha, cliente, productos_vendidos,codigo_venta)
-        self.__local = local
+        self.__local = self.nuevo_local(local)
 
     @property
     def local(self):
@@ -112,6 +125,19 @@ class VentaLocal(Venta):
         data = super().to_dict()
         data['local'] = self.local
         return data
+    
+    @local.setter
+    def local(self, validar_local):
+        self.__local = self.nuevo_local(validar_local)
+
+    def nuevo_local(self, local):
+        try:
+            N_local = local
+            if N_local != str(local):
+                raise ValueError('valor no valido (desde if)')
+            return  N_local
+        except Exception as error:
+            print(f'error inesperado: {error} (desde except)')
     
     def __str__(self):
         return f'{super().__str__()} local: {self.local}'
@@ -133,7 +159,7 @@ class Gestion():
 
     def guardar_datos(self,datos):               #------------ probar y estudiar
         try:
-            with open(self.archivo) as file:
+            with open(self.archivo, 'w') as file:
                 json.dump(datos,file, indent=4)          #-------- dump es lo opuesto a load, convierte un objeto python a uno json para modificarlo     
         except IOError as error:                 #---------------------- estudiar esta linea (probar otro nomre en IOError)
             print(f'error al guardar los datos en {self.archivo}: {error}  (except 1)')
@@ -147,24 +173,24 @@ class Gestion():
             if not str(codigo) in datos.keys():
                 datos[codigo] = codigo_v.to_dict()
                 self.guardar_datos(datos)              #--------- revisar la linea de abajo, porsible error en producto
-                print(f'la venta se realizo correctamente \n cliente:{codigo.cliente} \n producto: {codigo.productos_vendidos}  (desde if)')
+                print(f'la venta se realizo correctamente (desde if)') #''' se ejecuta al usar la opcion 2'''
             else:
-                print(f'codigo {codigo} (desde else)')
+                print(f'codigo {codigo} (desde else)')    #'''se ejecuta este codigo al usar la opcion 1, revisar'''
         except Exception as error:
             print(f'Error inesperado al crear venta: {error}  (desde except)')
 
     def encontrar_venta(self, codigo_v):
         try:
-            datos = self.leer_archivo_json()
+            datos = self.leer_archivo_json()         # '''no se encuenta el dato al usar la opcion 3
             if codigo_v in datos:                    # ----------- posible error en nombre de variable codigo_v
                 venta_data = datos[codigo_v]
                 if 'pagina' in venta_data:
                     venta = VentaOnline(**venta_data)     #------ ** significa que es o pasa un diccionario 
                 else:
                     venta = VentaLocal(**venta_data)
-                print(f' venta encontrada con codigo {codigo_v}')
+                print(f' venta con codigo {codigo_v} encontrada')
             else:
-                print(f'mo se encontro codigo de venta Nº {codigo_v}')
+                print(f'no se encontro una venta con codigo Nº {codigo_v}')
 
         except Exception as error:
             print(f'error al encontrar la venta: {error}')
@@ -182,10 +208,15 @@ class Gestion():
         except Exception as error:
             print(f'error al eliminar venta: {error}')
 
-p = Venta('12/03/1350','andy',12,3215)
-print(p)
-p = p.nuevo_codigo(21),p.nuevo_cliente('dfglokjnhsfd'),p.nuevo_producto(36)
-print(p)
 
 
+
+
+'''
+i usually wake up at 8 a.m and then drink a coffee, 
+depends of the day i have online classes or i review last class before to start practice,
+sometimes i study a bit of microsoft azure on codigofacilito, i dont have time to study many things,
+but i hope to get a certified on azure developer associate, in the afthernoon
+i always study some of data analytic on informatorio and in the evening i work on perfecting my english with technical english course
+'''
 

@@ -1,4 +1,4 @@
-from laboratorio_ventas import Venta, VentaLocal,VentaOnline, Gestion
+from laboratorio_ventas import VentaLocal,VentaOnline, Gestion
 import os, platform
 
 def limpiar_pantalla():   #limpia la pantalla segun el sistema operativo
@@ -9,27 +9,27 @@ def limpiar_pantalla():   #limpia la pantalla segun el sistema operativo
 
 def mostrar_menu():
     print("========== Menú de Gestión de ventas ==========")
-    print('1. agregar venta online')
-    print('2. agregar venta local')
-    print('3. buscar venta por codigo')
-    print('4. eliminar venta')
-    print('5. mostrar todas las ventas')
-    print('6. salir')
+    print('1. Agregar venta online')
+    print('2. Agregar venta local')
+    print('3. Buscar venta por codigo')
+    print('4. Eliminar venta')
+    print('5. Mostrar todas las ventas')
+    print('6. Salir')
     print('================================================')
 
 def agregar_venta(gestion, tipo_venta):
     try:
-        fecha = input('ingrese la fecha')
-        cliente = input('ingresar cliente')
-        producto = input('ingresar producto')
-        codigo = int(input('ingresar codigo de venta'))
+        codigo = int(input('Ingresar codigo de venta: '))
+        fecha = input('Ingrese fecha de la venta: ')
+        cliente = input('Ingresar nombre del cliente: ')
+        producto = input('Ingresar nombre del producto: ')
         
         if tipo_venta == '1':
-            pagina = input('ingresar nombre de la pagina')
+            pagina = input('ingresar nombre de la pagina: ')
             venta = VentaOnline(fecha,cliente, producto, codigo,pagina)     #--- revisar nombre de la instancia, posible error
         
         elif tipo_venta == '2':
-            local = input('ingresar nombre del local')
+            local = input('ingresar nombre del local: ')
             venta = VentaLocal(fecha, cliente, producto, codigo, local)
         else:
             print('opcion no valida')
@@ -57,15 +57,13 @@ def mostrar_todas_las_ventas(gestion):
     print('==============  lista de ventas  ==================')
     for ventas in gestion.leer_archivo_json().values():
         if 'pagina' in ventas:
-            print(f"{ventas['cliente']} - pagina {ventas['pagina']}" )
+            print(f"nombre: {ventas['cliente']} - pagina: {ventas['pagina']}" )
         else:
-            print(f"{ventas['cliente']} - local {ventas['local']}" )
+            print(f"nombre: {ventas['cliente']} - local: {ventas['local']}" )
     print('====================================================')
     input('presione un  tecla para limpiar la pantalla: ')
 
-
-
-if __name__ == '__main_ventas__':                         #--- sirve para leer un archivo py
+if __name__ == '__main__':                         #--- sirve para leer un archivo py
     archivo_ventas = 'laboratorio_ventas.json'
     gestion_ventas = Gestion(archivo_ventas)
 
