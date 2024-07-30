@@ -18,30 +18,72 @@ def mostrar_menu():
     print('================================================')
 
 def agregar_venta(gestion, tipo_venta):
-    try:
-        codigo = int(input('Ingresar codigo de venta: '))
-        fecha = input('Ingrese fecha de la venta: ')
-        cliente = input('Ingresar nombre del cliente: ')
-        producto = input('Ingresar nombre del producto: ')
-        
-        if tipo_venta == '1':
-            pagina = input('ingresar nombre de la pagina: ')
-            venta = VentaOnline(fecha,cliente, producto, codigo,pagina)     #--- revisar nombre de la instancia, posible error
-        
-        elif tipo_venta == '2':
-            local = input('ingresar nombre del local: ')
-            venta = VentaLocal(fecha, cliente, producto, codigo, local)
-        else:
-            print('opcion no valida')
-            return
-        
-        gestion.crear_venta(venta)              #---------- posible error
-        input('presione un  tecla para limpiar la pantalla: ')
+    while True:
+        try:
+            while True:
+                try:
+                    codigo = int(input('Ingresar código de venta: '))
+                    break  # Salir del bucle si el dato es válido
+                except ValueError:
+                    print('Error: El código de venta debe ser un número entero.')
 
-    except ValueError as error:
-        print(f'Error: {error}')
-    except Exception as error:
-        print(f'Error inesperado: {error}')
+            while True:
+                fecha = input('Ingrese fecha de la venta (dd/mm/aaaa): ')
+                try:
+                    gestion.nueva_fecha(fecha)  # Validar la fecha
+                    break  # Salir del bucle si la fecha es válida
+                except ValueError as error:
+                    print(f'Error: {error}')
+
+            while True:
+                cliente = input('Ingresar nombre del cliente: ')
+                try:
+                    gestion.nuevo_cliente(cliente)  # Validar el nombre del cliente
+                    break  # Salir del bucle si el cliente es válido
+                except ValueError as error:
+                    print(f'Error: {error}')
+
+            while True:
+                producto = input('Ingresar nombre del producto: ')
+                try:
+                    gestion.nuevo_producto(producto)  # Validar el nombre del producto
+                    break  # Salir del bucle si el producto es válido
+                except ValueError as error:
+                    print(f'Error: {error}')
+
+            if tipo_venta == '1':
+                while True:
+                    pagina = input('Ingresar nombre de la página: ')
+                    try:
+                        gestion.nueva_pagina(pagina)  # Validar el nombre de la página
+                        break  # Salir del bucle si la página es válida
+                    except ValueError as error:
+                        print(f'Error: {error}')
+                
+                venta = VentaOnline(fecha, cliente, producto, codigo, pagina)
+            
+            elif tipo_venta == '2':
+                while True:
+                    local = input('Ingresar nombre del local: ')
+                    try:
+                        gestion.nuevo_local(local)  # Validar el nombre del local
+                        break  # Salir del bucle si el local es válido
+                    except ValueError as error:
+                        print(f'Error: {error}')
+
+                venta = VentaLocal(fecha, cliente, producto, codigo, local)
+            
+            else:
+                print('Opción no válida')
+                return
+            
+            gestion.crear_venta(venta)
+            print('Venta creada exitosamente.')
+            input('Presione una tecla para continuar...')
+            break  # Salir del bucle principal después de crear la venta
+
+        except Exception as error:
+            print(f'Error inesperado: {error}')
 
 def buscar_venta_por_codigo(gestion):
     codigo = int(input('ingrese el codigo de la venta que quiere buscar: '))
