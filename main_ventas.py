@@ -20,58 +20,20 @@ def mostrar_menu():
 def agregar_venta(gestion, tipo_venta):
     while True:
         try:
-            while True:
-                try:
-                    codigo = int(input('Ingresar código de venta: '))
-                    break  # Salir del bucle si el dato es válido
-                except ValueError:
-                    print('Error: El código de venta debe ser un número entero.')
-
-            while True:
-                fecha = input('Ingrese fecha de la venta (dd/mm/aaaa): ')
-                try:
-                    gestion.nueva_fecha(fecha)  # Validar la fecha
-                    break  # Salir del bucle si la fecha es válida
-                except ValueError as error:
-                    print(f'Error: {error}')
-
-            while True:
-                cliente = input('Ingresar nombre del cliente: ')
-                try:
-                    gestion.nuevo_cliente(cliente)  # Validar el nombre del cliente
-                    break  # Salir del bucle si el cliente es válido
-                except ValueError as error:
-                    print(f'Error: {error}')
-
-            while True:
-                producto = input('Ingresar nombre del producto: ')
-                try:
-                    gestion.nuevo_producto(producto)  # Validar el nombre del producto
-                    break  # Salir del bucle si el producto es válido
-                except ValueError as error:
-                    print(f'Error: {error}')
+            codigo = int(input('ingrese el codigo de venta: '))
+            cliente = input('ingrese el nombre del cliente: ')
+            producto = input('ingrese el nombre del producto: ')
+            fecha = input('ingrese la fecha: ')
+            total = float(input('ingrese el total de venta recaudado: '))
+            costo = float(input('ingrese el costo de venta :'))
 
             if tipo_venta == '1':
-                while True:
-                    pagina = input('Ingresar nombre de la página: ')
-                    try:
-                        gestion.nueva_pagina(pagina)  # Validar el nombre de la página
-                        break  # Salir del bucle si la página es válida
-                    except ValueError as error:
-                        print(f'Error: {error}')
-                
-                venta = VentaOnline(fecha, cliente, producto, codigo, pagina)
+                pagina = input('Ingresar nombre de la página: ')
+                venta = VentaOnline(fecha, cliente, producto, codigo,total, costo, pagina)
             
             elif tipo_venta == '2':
-                while True:
-                    local = input('Ingresar nombre del local: ')
-                    try:
-                        gestion.nuevo_local(local)  # Validar el nombre del local
-                        break  # Salir del bucle si el local es válido
-                    except ValueError as error:
-                        print(f'Error: {error}')
-
-                venta = VentaLocal(fecha, cliente, producto, codigo, local)
+                local = input('Ingresar nombre del local: ')
+                venta = VentaLocal(fecha, cliente, producto, codigo, total, costo, local)
             
             else:
                 print('Opción no válida')
@@ -96,14 +58,39 @@ def eliminar_venta_por_codigo(gestion):
     input('presione un  tecla para limpiar la pantalla: ')
 
 def mostrar_todas_las_ventas(gestion):
-    print('==============  lista de ventas  ==================')
-    for ventas in gestion.leer_archivo_json().values():
-        if 'pagina' in ventas:
-            print(f"nombre: {ventas['cliente']} - pagina: {ventas['pagina']}" )
+    print('==============  Lista de Ventas  ==================')
+    
+    ventas_data = gestion.leer_archivo_json()
+    
+    for venta_data in ventas_data.values():
+        # Determinar el tipo de venta
+        if 'pagina' in venta_data:
+            # Crear instancia de VentaOnline
+            venta = VentaOnline(
+                fecha=venta_data['fecha'],
+                cliente=venta_data['cliente'],
+                productos_vendidos=venta_data['productos_vendidos'],
+                codigo_venta=venta_data['codigo_venta'],
+                total_recaudado=venta_data['total_recaudado'],
+                costo=venta_data['costo'],
+                pagina=venta_data['pagina']
+            )
         else:
-            print(f"nombre: {ventas['cliente']} - local: {ventas['local']}" )
+            # Crear instancia de VentaLocal
+            venta = VentaLocal(
+                fecha=venta_data['fecha'],
+                cliente=venta_data['cliente'],
+                productos_vendidos=venta_data['productos_vendidos'],
+                codigo_venta=venta_data['codigo_venta'],
+                total_recaudado=venta_data['total_recaudado'],
+                costo=venta_data['costo'],
+                local=venta_data['local']
+            )
+        
+        print(venta)  # Usa el método __str__ para mostrar la información de la venta
+
     print('====================================================')
-    input('presione un  tecla para limpiar la pantalla: ')
+    input('Presione una tecla para limpiar la pantalla: ')
 
 if __name__ == '__main__':                         #--- sirve para leer un archivo py
     archivo_ventas = 'laboratorio_ventas.json'
@@ -127,5 +114,3 @@ if __name__ == '__main__':                         #--- sirve para leer un archi
             break
         else:
             print('opcion no valida')
-
-

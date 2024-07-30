@@ -1,0 +1,20 @@
+{
+    "4": {
+        "fecha": "06/05/2024",
+        "cliente": "Miguel",
+        "productos_vendidos": "perfume",
+        "codigo_venta": 4,
+        "total_recaudado": 20000.0,
+        "costo": 15000.0,
+        "local": "Noah"
+    },
+    "1": {
+        "fecha": "01/01/2000",
+        "cliente": "juan",
+        "productos_vendidos": "nose",
+        "codigo_venta": 1,
+        "total_recaudado": 3212.0,
+        "costo": 123.0,
+        "pagina": "jjlopez"
+    }
+}

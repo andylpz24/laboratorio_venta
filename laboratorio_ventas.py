@@ -11,11 +11,13 @@ import json
 from datetime import datetime
 
 class Venta():
-    def __init__(self,fecha, cliente, productos_vendidos, codigo_venta):
+    def __init__(self,fecha, cliente, productos_vendidos, codigo_venta, total_recaudado, costo):
         self.__fecha = self.nueva_fecha(fecha)
         self.__cliente = self.nuevo_cliente(cliente)     #------ usa la funcion para crear el objeto
         self.__productos_vendidos = self.nuevo_producto(productos_vendidos)
         self.__codigo_venta = self.nuevo_codigo(codigo_venta)
+        self.__total_recaudado = self.nuevo_total(total_recaudado)
+        self.__costo = self.nuevo_costo(costo)
 
     @property                       #---- property conviente los atributos en propiedad, esto se hace para  no usar objeto.atributo() 
     def cliente(self):              #---- sino que funciona sin () y se puede aplicar logica y consultar/modificar el dato
@@ -32,13 +34,23 @@ class Venta():
     @property
     def codigo_venta(self):
         return self.__codigo_venta
+    
+    @property
+    def total_recaudado(self):
+        return self.__total_recaudado
+    
+    @property
+    def costo(self):
+        return self.__costo
 
     def to_dict(self):                  #--------------- diccionario para llamar a los atributos de la clase base
         return {
             'fecha' : self.fecha,
             'cliente' : self.cliente,
             'productos_vendidos' : self.productos_vendidos,
-            'codigo_venta' : self.codigo_venta
+            'codigo_venta' : self.codigo_venta,
+            'total_recaudado' : self.total_recaudado,
+            'costo' : self.costo
             }
 
     @cliente.setter                    #---------------- setter es para modificar el atributo
@@ -56,6 +68,14 @@ class Venta():
     @fecha.setter
     def fecha(self, validar_fecha):
         self.__fecha = self.nueva_fecha(validar_fecha)
+
+    @total_recaudado.setter
+    def total_recaudado(self, validar_total):
+        self.__total_recaudado = self.nuevo_total(validar_total)
+
+    @costo.setter
+    def costo(self, validar_costo):
+        self.__costo = self.nuevo_costo(validar_costo)
 
     def nuevo_cliente(self, cliente):
         if not isinstance(cliente, str):
@@ -87,14 +107,29 @@ class Venta():
             except ValueError as e:
                 raise ValueError(f'La fecha debe estar en el formato dd/mm/aaaa. {e}')
 
+    def nuevo_total(self, total):
+        if not isinstance(total, float):
+            raise ValueError('El código de venta debe ser un número entero.')
+        return total
+    
+    def nuevo_costo(self, costo):
+        if not isinstance(costo, float):
+            raise ValueError('El código de venta debe ser un número entero.')
+        return costo
 
 
-    def __str__(self):                  #-------------- metodo str para llamar a los atributos en string
-        return f'{self.fecha}, {self.cliente},{self.productos_vendidos}, {self.codigo_venta}'
+    def __str__(self):
+        return ('=========================================== \n'
+                f'Código de venta: {self.codigo_venta}\n'
+                f'Cliente: {self.cliente}\n'
+                f'Producto: {self.productos_vendidos}\n'
+                f'Fecha: {self.fecha}\n'
+                f'Total recaudado: {self.total_recaudado}\n'
+                f'Costo: {self.costo}\n')
 
 class VentaOnline(Venta):
-    def __init__(self, fecha, cliente, productos_vendidos, codigo_venta, pagina):
-        super().__init__(fecha, cliente, productos_vendidos, codigo_venta)
+    def __init__(self, fecha, cliente, productos_vendidos, codigo_venta, total_recaudado, costo, pagina):
+        super().__init__(fecha, cliente, productos_vendidos, codigo_venta, total_recaudado, costo)
         self.__pagina = self.nueva_pagina(pagina)
 
     @property
@@ -117,13 +152,12 @@ class VentaOnline(Venta):
             raise ValueError('El nombre de la pagina no debe contener números.')
         return pagina
 
-
     def __str__(self):
-        return f'{super().__str__()} pagina: {self.pagina}'        #----------- estudiar esta linea
-
+        return (f'{super().__str__()}Pagina: {self.pagina}\n'        #----------- estudiar esta linea
+                '===========================================')
 class VentaLocal(Venta):
-    def __init__(self, fecha, cliente, productos_vendidos,codigo_venta,local):
-        super().__init__(fecha, cliente, productos_vendidos,codigo_venta)
+    def __init__(self, fecha, cliente, productos_vendidos,codigo_venta, total_recaudado, costo ,local):
+        super().__init__(fecha, cliente, productos_vendidos,codigo_venta, total_recaudado, costo)
         self.__local = self.nuevo_local(local)
 
     @property
@@ -146,9 +180,9 @@ class VentaLocal(Venta):
             raise ValueError('El nombre del local no debe contener números.')
         return local
 
-    
     def __str__(self):
-        return f'{super().__str__()} local: {self.local}'
+        return (f'{super().__str__()}Local: {self.local}\n'
+                '=========================================')
 
 class Gestion():
     def __init__(self, archivo_json):
@@ -204,7 +238,8 @@ class Gestion():
                     venta = VentaOnline(**venta_data)     #------ ** significa que es o pasa un diccionario 
                 else:
                     venta = VentaLocal(**venta_data)
-                print(f' venta con codigo {codigo_v} encontrada')
+                print(f'venta encontrada exitosamente')
+                print(venta)
             else:
                 print(f'no se encontro una venta con codigo Nº {codigo_v}')
 
