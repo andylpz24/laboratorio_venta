@@ -1,11 +1,11 @@
 from laboratorio_ventas import VentaLocal,VentaOnline, Gestion
 import os, platform
 
-def limpiar_pantalla():   #limpia la pantalla segun el sistema operativo
+def limpiar_pantalla():  
     if platform.system() == 'windows':
         os.system('cls')
     else:
-        os.system('clear')    #para linux o mac
+        os.system('clear')   
 
 def mostrar_menu():
     print("========== Menú de Gestión de ventas ==========")
@@ -14,18 +14,19 @@ def mostrar_menu():
     print('3. Buscar venta por codigo')
     print('4. Eliminar venta')
     print('5. Mostrar todas las ventas')
-    print('6. Salir')
+    print('6. Actualizar costo de venta')
+    print('7. Salir')
     print('================================================')
 
 def agregar_venta(gestion, tipo_venta):
     while True:
         try:
-            codigo = int(input('ingrese el codigo de venta: '))
+            codigo = int(input('ingrese el codigo de venta (debe ser un numero entero) :'))
             cliente = input('ingrese el nombre del cliente: ')
             producto = input('ingrese el nombre del producto: ')
-            fecha = input('ingrese la fecha: ')
+            fecha = input('ingrese la fecha (debe estar en formato dd/mm/aaaa): ')
             total = float(input('ingrese el total de venta recaudado: '))
-            costo = float(input('ingrese el costo de venta :'))
+            costo = float(input('ingrese el costo de venta: '))
 
             if tipo_venta == '1':
                 pagina = input('Ingresar nombre de la página: ')
@@ -42,7 +43,7 @@ def agregar_venta(gestion, tipo_venta):
             gestion.crear_venta(venta)
             print('Venta creada exitosamente.')
             input('Presione una tecla para continuar...')
-            break  # Salir del bucle principal después de crear la venta
+            break  
 
         except Exception as error:
             print(f'Error inesperado: {error}')
@@ -57,15 +58,21 @@ def eliminar_venta_por_codigo(gestion):
     gestion.eliminar_venta(codigo)
     input('presione un  tecla para limpiar la pantalla: ')
 
+def actualizar_costo(gestion):
+    codigo = input('ingrese codigo de venta para actualizar el costo: ')
+    costo = float(input('ingrese el costo de venta: '))
+    gestion.actualizar_costo(codigo, costo)
+    input('presione un  tecla para limpiar la pantalla: ')
+
 def mostrar_todas_las_ventas(gestion):
     print('==============  Lista de Ventas  ==================')
     
     ventas_data = gestion.leer_archivo_json()
     
     for venta_data in ventas_data.values():
-        # Determinar el tipo de venta
+    
         if 'pagina' in venta_data:
-            # Crear instancia de VentaOnline
+        
             venta = VentaOnline(
                 fecha=venta_data['fecha'],
                 cliente=venta_data['cliente'],
@@ -76,7 +83,7 @@ def mostrar_todas_las_ventas(gestion):
                 pagina=venta_data['pagina']
             )
         else:
-            # Crear instancia de VentaLocal
+            
             venta = VentaLocal(
                 fecha=venta_data['fecha'],
                 cliente=venta_data['cliente'],
@@ -87,12 +94,12 @@ def mostrar_todas_las_ventas(gestion):
                 local=venta_data['local']
             )
         
-        print(venta)  # Usa el método __str__ para mostrar la información de la venta
+        print(venta)  
 
     print('====================================================')
     input('Presione una tecla para limpiar la pantalla: ')
 
-if __name__ == '__main__':                         #--- sirve para leer un archivo py
+if __name__ == '__main__':                         
     archivo_ventas = 'laboratorio_ventas.json'
     gestion_ventas = Gestion(archivo_ventas)
 
@@ -110,6 +117,8 @@ if __name__ == '__main__':                         #--- sirve para leer un archi
         elif opcion == '5':
             mostrar_todas_las_ventas(gestion_ventas)
         elif opcion == '6':
+            actualizar_costo(gestion_ventas)
+        elif opcion == '7':
             print('proceso finalizado')
             break
         else:

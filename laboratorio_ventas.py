@@ -13,14 +13,14 @@ from datetime import datetime
 class Venta():
     def __init__(self,fecha, cliente, productos_vendidos, codigo_venta, total_recaudado, costo):
         self.__fecha = self.nueva_fecha(fecha)
-        self.__cliente = self.nuevo_cliente(cliente)     #------ usa la funcion para crear el objeto
+        self.__cliente = self.nuevo_cliente(cliente)     
         self.__productos_vendidos = self.nuevo_producto(productos_vendidos)
         self.__codigo_venta = self.nuevo_codigo(codigo_venta)
         self.__total_recaudado = self.nuevo_total(total_recaudado)
         self.__costo = self.nuevo_costo(costo)
 
-    @property                       #---- property conviente los atributos en propiedad, esto se hace para  no usar objeto.atributo() 
-    def cliente(self):              #---- sino que funciona sin () y se puede aplicar logica y consultar/modificar el dato
+    @property                      
+    def cliente(self):              
         return self.__cliente
 
     @property
@@ -43,7 +43,7 @@ class Venta():
     def costo(self):
         return self.__costo
 
-    def to_dict(self):                  #--------------- diccionario para llamar a los atributos de la clase base
+    def to_dict(self):                 
         return {
             'fecha' : self.fecha,
             'cliente' : self.cliente,
@@ -53,9 +53,9 @@ class Venta():
             'costo' : self.costo
             }
 
-    @cliente.setter                    #---------------- setter es para modificar el atributo
+    @cliente.setter                   
     def cliente(self,validar_cliente):
-        self.__cliente = self.nuevo_cliente(validar_cliente) #------------ usa la funcion para actualizar/modificar el objeto
+        self.__cliente = self.nuevo_cliente(validar_cliente) 
 
     @productos_vendidos.setter
     def productos_vendidos(self, validar_producto):
@@ -87,8 +87,6 @@ class Venta():
     def nuevo_producto(self, producto):
         if not isinstance(producto, str):
             raise ValueError('El nombre del producto debe ser una cadena de texto.')
-        if any(char.isdigit() for char in producto):
-            raise ValueError('El nombre del producto no debe contener números.')
         return producto
 
     def nuevo_codigo(self, codigo):
@@ -136,7 +134,7 @@ class VentaOnline(Venta):
     def pagina(self):
         return self.__pagina
 
-    def to_dict(self):                #----------- estudiar este metodo
+    def to_dict(self):               
         data = super().to_dict()
         data['pagina'] = self.pagina
         return data
@@ -153,8 +151,9 @@ class VentaOnline(Venta):
         return pagina
 
     def __str__(self):
-        return (f'{super().__str__()}Pagina: {self.pagina}\n'        #----------- estudiar esta linea
+        return (f'{super().__str__()}Pagina: {self.pagina}\n'       
                 '===========================================')
+    
 class VentaLocal(Venta):
     def __init__(self, fecha, cliente, productos_vendidos,codigo_venta, total_recaudado, costo ,local):
         super().__init__(fecha, cliente, productos_vendidos,codigo_venta, total_recaudado, costo)
@@ -196,18 +195,18 @@ class Gestion():
         except FileNotFoundError:
             return {}
         except json.JSONDecodeError:
-            return {}  # Si el archivo está vacío o no es un JSON válido, devuelve un diccionario vacío
+            return {}  
         except Exception as error:
             raise Exception(f'error al abrir el archivo: {error}')
         else:
             return datos
 
 
-    def guardar_datos(self,datos):               #------------ probar y estudiar
+    def guardar_datos(self,datos):              
         try:
             with open(self.archivo, 'w') as file:
-                json.dump(datos,file, indent=4)          #-------- dump es lo opuesto a load, convierte un objeto python a uno json para modificarlo     
-        except IOError as error:                 #---------------------- estudiar esta linea (probar otro nomre en IOError)
+                json.dump(datos,file, indent=4)          
+        except IOError as error:                
             print(f'error al guardar los datos en {self.archivo}: {error}  (except 1)')
         except Exception as error:
             print(f'error inesperado {error}   (except 2)')
@@ -230,12 +229,12 @@ class Gestion():
     
     def encontrar_venta(self, codigo_v):
         try:
-            datos = self.leer_archivo_json()         # '''no se encuenta el dato al usar la opcion 3
+            datos = self.leer_archivo_json()       
             codigo_v = str(codigo_v)
-            if codigo_v in datos:                    # ----------- posible error en nombre de variable codigo_v
+            if codigo_v in datos:                   
                 venta_data = datos[codigo_v]
                 if 'pagina' in venta_data:
-                    venta = VentaOnline(**venta_data)     #------ ** significa que es o pasa un diccionario 
+                    venta = VentaOnline(**venta_data)     
                 else:
                     venta = VentaLocal(**venta_data)
                 print(f'venta encontrada exitosamente')
@@ -258,5 +257,18 @@ class Gestion():
 
         except Exception as error:
             print(f'error al eliminar venta: {error}')
+
+    def actualizar_costo(self, codigo, nuevo_costo):
+        try:
+            datos = self.leer_archivo_json()
+            if codigo in datos.keys():
+                datos[codigo]['costo'] = nuevo_costo
+                self.guardar_datos(datos)
+                print(f'se actualizo el costo de la venta con codigo {codigo}')
+            else:
+                print(f'no se encontro un venta con codigo {codigo}')
+
+        except Exception as error:
+            print(f'error encontrado: {error}')
 
 
