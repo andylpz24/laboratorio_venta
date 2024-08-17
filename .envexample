@@ -1,0 +1,5 @@
+db_host = host     #los valores son solo de ejemplo
+db_name = database_name
+db_user = user_name
+db_password = pass
+db_port = 3308

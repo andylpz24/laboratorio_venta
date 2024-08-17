@@ -4,8 +4,6 @@ import os, platform
 def limpiar_pantalla():  
     if platform.system() == 'windows':
         os.system('cls')
-    else:
-        os.system('clear')   
 
 def mostrar_menu():
     print("========== Menú de Gestión de ventas ==========")
@@ -21,27 +19,26 @@ def mostrar_menu():
 def agregar_venta(gestion, tipo_venta):
     while True:
         try:
-            codigo = int(input('ingrese el codigo de venta (debe ser un numero entero) :'))
+            codigo_venta = int(input('ingrese el codigo de venta (debe ser un numero entero): '))
             cliente = input('ingrese el nombre del cliente: ')
             producto = input('ingrese el nombre del producto: ')
-            fecha = input('ingrese la fecha (debe estar en formato dd/mm/aaaa): ')
+            fecha = input('ingrese la fecha (separardo por -): ')
             total = float(input('ingrese el total de venta recaudado: '))
             costo = float(input('ingrese el costo de venta: '))
 
             if tipo_venta == '1':
                 pagina = input('Ingresar nombre de la página: ')
-                venta = VentaOnline(fecha, cliente, producto, codigo,total, costo, pagina)
+                venta = VentaOnline(fecha, cliente, producto, codigo_venta,total, costo, pagina)
             
             elif tipo_venta == '2':
-                local = input('Ingresar nombre del local: ')
-                venta = VentaLocal(fecha, cliente, producto, codigo, total, costo, local)
+                local_ = input('Ingresar nombre del local: ')
+                venta = VentaLocal(fecha, cliente, producto, codigo_venta, total, costo, local_)
             
             else:
                 print('Opción no válida')
                 return
             
             gestion.crear_venta(venta)
-            print('Venta creada exitosamente.')
             input('Presione una tecla para continuar...')
             break  
 
@@ -49,8 +46,8 @@ def agregar_venta(gestion, tipo_venta):
             print(f'Error inesperado: {error}')
 
 def buscar_venta_por_codigo(gestion):
-    codigo = int(input('ingrese el codigo de la venta que quiere buscar: '))
-    gestion.encontrar_venta(codigo)
+    codigo_venta = int(input('ingrese el codigo de la venta que quiere buscar: '))
+    gestion.encontrar_venta(codigo_venta)
     input('presione un  tecla para limpiar la pantalla: ')
 
 def eliminar_venta_por_codigo(gestion):
@@ -66,42 +63,31 @@ def actualizar_costo(gestion):
 
 def mostrar_todas_las_ventas(gestion):
     print('==============  Lista de Ventas  ==================')
-    
-    ventas_data = gestion.leer_archivo_json()
-    
-    for venta_data in ventas_data.values():
-    
-        if 'pagina' in venta_data:
-        
-            venta = VentaOnline(
-                fecha=venta_data['fecha'],
-                cliente=venta_data['cliente'],
-                productos_vendidos=venta_data['productos_vendidos'],
-                codigo_venta=venta_data['codigo_venta'],
-                total_recaudado=venta_data['total_recaudado'],
-                costo=venta_data['costo'],
-                pagina=venta_data['pagina']
-            )
-        else:
-            
-            venta = VentaLocal(
-                fecha=venta_data['fecha'],
-                cliente=venta_data['cliente'],
-                productos_vendidos=venta_data['productos_vendidos'],
-                codigo_venta=venta_data['codigo_venta'],
-                total_recaudado=venta_data['total_recaudado'],
-                costo=venta_data['costo'],
-                local=venta_data['local']
-            )
-        
-        print(venta)  
+    try:
+        ventas = gestion.mostrar_todas_las_ventas()
+        for venta in ventas:
+            if isinstance(venta, VentaLocal):
+                print('-----------------------------------------\n'
+                    f'tipo de venta: venta local \n'
+                    f'codigo de venta: {venta.codigo_venta}\n'
+                    f'nombre del cliente: {venta.cliente}\n'
+                    f'local: {venta.local_}')
+                
+            elif isinstance(venta, VentaOnline):
+                print('-----------------------------------------\n'
+                    f'tipo de venta: venta online \n'
+                    f'codigo de venta: {venta.codigo_venta}\n'
+                    f'nombre del cliente: {venta.cliente}\n'
+                    f'pagina: {venta.pagina}')
+
+    except Exception as e:
+        print(f'error al mostrar todas las ventas: {e}')
 
     print('====================================================')
     input('Presione una tecla para limpiar la pantalla: ')
 
 if __name__ == '__main__':                         
-    archivo_ventas = 'laboratorio_ventas.json'
-    gestion_ventas = Gestion(archivo_ventas)
+    gestion_ventas = Gestion()
 
     while True:
         limpiar_pantalla()
@@ -123,3 +109,6 @@ if __name__ == '__main__':
             break
         else:
             print('opcion no valida')
+
+
+
